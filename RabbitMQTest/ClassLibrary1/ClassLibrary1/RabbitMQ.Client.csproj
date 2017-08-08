@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class1.cs" />
+    <Compile Include="Common\Unity.cs" />
     <Compile Include="Context\RabbitMQContext.cs" />
     <Compile Include="EventMessage.cs" />
     <Compile Include="IMessageSerializer.cs" />
@@ -53,9 +54,7 @@
     <Compile Include="QueueProducer.cs" />
     <Compile Include="RabbitMQClient.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Common\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
