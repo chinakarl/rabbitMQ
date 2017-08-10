@@ -45,14 +45,20 @@
   <ItemGroup>
     <Compile Include="Class1.cs" />
     <Compile Include="Common\Unity.cs" />
+    <Compile Include="ConfigCommon\ConfigFactory.cs" />
+    <Compile Include="ConfigCommon\ConfigModel.cs" />
     <Compile Include="Context\RabbitMQContext.cs" />
     <Compile Include="EventMessage.cs" />
+    <Compile Include="EventMessageFactory.cs" />
+    <Compile Include="EventMessageResult.cs" />
     <Compile Include="IMessageSerializer.cs" />
     <Compile Include="IRabbitMQClient.cs" />
     <Compile Include="MessageSerializer.cs" />
+    <Compile Include="MessageSerializerFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueueProducer.cs" />
     <Compile Include="RabbitMQClient.cs" />
+    <Compile Include="RabbitMQClientFactory.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

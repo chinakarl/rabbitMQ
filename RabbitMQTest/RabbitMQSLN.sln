@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQ.Client", "ClassLibrary1\ClassLibrary1\RabbitMQ.Client.csproj", "{844847E9-CA6D-44DA-BFFC-1ED0B3E2AAA6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQClient", "ClassLibrary1\ClassLibrary1\RabbitMQClient.csproj", "{844847E9-CA6D-44DA-BFFC-1ED0B3E2AAA6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQConsole", "RabbitMQConsole\RabbitMQConsole.csproj", "{1B352EB5-03F2-466A-B7B6-BB250E4B4999}"
 EndProject

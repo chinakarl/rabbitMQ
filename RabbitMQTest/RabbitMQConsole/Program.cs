@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RabbitMQ.Client;
+using RabbitMQClient;
 namespace RabbitMQConsole
 {
     class Program
@@ -13,20 +14,61 @@ namespace RabbitMQConsole
         private static string ExchangeName = "zhxtest.exchange";
         static void Main(string[] args)
         {
-            using (IConnection conn = rabbitMqFactory.CreateConnection())
-            using (IModel channel = conn.CreateModel())
+            //using (IConnection conn = rabbitMqFactory.CreateConnection())
+            //using (IModel channel = conn.CreateModel())
+            //{
+            //    channel.ExchangeDeclare(ExchangeName, "direct", durable: true, autoDelete: false, arguments: null);
+
+            //    channel.QueueDeclare(QueueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
+
+            //    channel.QueueBind(QueueName, ExchangeName, routingKey: QueueName);
+            //    string message = "hellow word";
+            //    var body = Encoding.UTF8.GetBytes(message);
+            //    channel.BasicPublish(ExchangeName, QueueName, null, body);
+            //    Console.WriteLine(message);
+            //}
+            //Console.ReadLine();
+        }
+        private static void Listening()
+        {
+            RabbitMQClient.RabbitMQClient.Instance.ActionHandlerMessage += mqClient_ActionEventMessage;
+            RabbitMQClient.RabbitMQClient.Instance.Queueing();
+        }
+
+        private static void mqClient_ActionEventMessage(EventMessageResult result)
+        {
+            if (result.EventMessageBytes.EventMessageMarkcode =="")
             {
-                channel.ExchangeDeclare(ExchangeName, "direct", durable: true, autoDelete: false, arguments: null);
+                var message =
+                    MessageSerializerFactory.CreateMessageSerializerInstance()
+                        .Deserialize<UpdatePurchaseOrderStatusByBillIdMqContract>(result.MessageBytes);
 
-                channel.QueueDeclare(QueueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
+                result.IsOperationOk = true; //处理成功
 
-                channel.QueueBind(QueueName, ExchangeName, routingKey: QueueName);
-                string message = "hellow word";
-                var body = Encoding.UTF8.GetBytes(message);
-                channel.BasicPublish(ExchangeName, QueueName, null, body);
-                Console.WriteLine(message);
+                Console.WriteLine(message.ModifiedBy);
             }
-            Console.ReadLine();
+        }
+
+        private static void SendEventMessage()
+        {
+            for (var i = 1; i < 10000; i++)
+            {
+                var originObject = new UpdatePurchaseOrderStatusByBillIdMqContract()
+                {
+                    UpdatePurchaseOrderStatusType = 1,
+                    RelationBillType = 10,
+                    RelationBillId = 10016779,
+                    UpdateStatus = 30,
+                    ModifiedBy = i
+                };
+
+                var sendMessage =
+                    EventMessageFactory.CreateEventMessageInstance(originObject, MessageTypeConst.ZgUpdatePurchaseStatus);
+
+                RabbitMqClient.Instance.TriggerEventMessage(sendMessage, "CMQ.Purchase", "CMQ.Purchase");
+
+                Console.WriteLine(i);
+            }
         }
     }
 }
