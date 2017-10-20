@@ -10,7 +10,7 @@ namespace RabbitMQClient
     /// <summary>
     /// RabbitMQ 工厂方法
     /// </summary>
-    internal class RabbitMQClientFactory
+    public class RabbitMQClientFactory
     {
         public static readonly RabbitMQClientFactory Instance = null;
         static RabbitMQClientFactory()

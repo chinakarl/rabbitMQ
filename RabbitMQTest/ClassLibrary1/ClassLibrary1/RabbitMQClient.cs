@@ -6,24 +6,25 @@ using System.Threading.Tasks;
 using RabbitMQClient.Common;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-
+using RabbitMQClient.ConfigCommon;
 namespace RabbitMQClient
 {
     public delegate void ActionHandler(EventMessageResult eventMessageResult);
     
     public class RabbitMQClient:IRabbitMQClient
     {
-        private static readonly RabbitMQClient _rabbitMQClient =null;
+        private static readonly RabbitMQClient _instance = new RabbitMQClient();
         public RabbitMQContext Context { get; set; }
         private ActionHandler _actionMessage;
+        private static IConnection _iConnection = null;
         
         static RabbitMQClient()
         {
-            _rabbitMQClient = new RabbitMQClient();
+            _iConnection = CreateConnection();
         }
         public static  IRabbitMQClient Instance
         {
-           get { return _rabbitMQClient; }
+           get { return _instance; }
         }
         public event ActionHandler ActionHandlerMessage
         {
@@ -40,9 +41,24 @@ namespace RabbitMQClient
         {
             Task.Factory.StartNew(QueueListen);
         }
+        static IConnection CreateConnection()
+        {
+            //获取配置信息
+            var result = ConfigFactory.Instance.GetAppSetting();
+            //创建连接工厂
+            var confactory = new ConnectionFactory
+            {
+                HostName = result.Host,
+                UserName = result.QName,
+                Password = result.QPassword,
+                RequestedHeartbeat = 60,//心跳超时时间
+                AutomaticRecoveryEnabled = true//自动重连
+            };
+            return confactory.CreateConnection();//创建连接
+        }
         private void QueueListen()
         {
-            Context.ListenConnection = RabbitMQClientFactory.Instance.CreateConnection();
+            Context.ListenConnection = _iConnection;
             Context.ListenConnection.ConnectionShutdown += (o, e) =>
             {
                 throw new Exception(e.ReplyText);

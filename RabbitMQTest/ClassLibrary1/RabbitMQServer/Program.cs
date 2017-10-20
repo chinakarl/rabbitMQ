@@ -14,6 +14,8 @@ namespace RabbitMQServer
         private static string ExchangeName = "zhxtest.exchange";
         static void Main(string[] args)
         {
+            while (true)
+            { 
             using (IConnection conn = rabbitMqFactory.CreateConnection())
             using (IModel channel = conn.CreateModel())
             {
@@ -22,6 +24,7 @@ namespace RabbitMQServer
                 var message = Encoding.UTF8.GetString(msgResponse.Body);
                 Console.WriteLine(" [x] Received {0}", message);
                 //channel.BasicConsume(queue: QueueName,autoAck:true,consumer:consumer);
+            }
             }
             Console.ReadLine();
         }
