@@ -10,8 +10,14 @@ namespace RabbitMQClient
     /// <summary>
     /// 上下文
     /// </summary>
-    public class RabbitMQContext
+    public class MessageContext
     {
+        //数据
+        public virtual object Data { get; set; }
+        /// <summary>
+        /// 原始数据
+        /// </summary>
+        public virtual byte[] RawData { get; set; }
         /// <summary>
         /// 发送链接Connection
         /// </summary>
@@ -32,5 +38,13 @@ namespace RabbitMQClient
         /// 队列名称
         /// </summary>
         public string ListenQueueName { get; set; }
+        /// <summary>
+        /// 异常队列名称
+        /// </summary>
+        public string ExchangeQueueName { get; set; }
+        /// <summary>
+        /// 队列数
+        /// </summary>
+        public int QueueCount { get; set; }
     }
 }

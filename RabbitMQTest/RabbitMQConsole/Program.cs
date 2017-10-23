@@ -27,8 +27,8 @@ namespace RabbitMQConsole
             //    channel.BasicPublish(ExchangeName, QueueName, null, body);
             //    Console.WriteLine(message);
             //}
-            IConnection con=   RabbitMQClientFactory.Instance.CreateConnection();
-            RabbitMQClientFactory.Instance.CreateModel(con);
+            //IConnection con=   RabbitMQClientFactory.Instance.CreateConnection();
+            //RabbitMQClientFactory.Instance.CreateModel(con);
 
 
             Console.ReadLine();

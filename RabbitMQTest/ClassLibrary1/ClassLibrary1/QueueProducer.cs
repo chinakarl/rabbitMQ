@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQClient.ConfigCommon;
-
+using RabbitMQClient.Common;
 namespace RabbitMQClient
 {
      //delegate void ActionHandler(EventMessageResult messageResult);
@@ -16,7 +16,7 @@ namespace RabbitMQClient
         private ActionHandler _actionMessage;
         private static IConnection _IConnection = null;
         private static IModel _IModel = null;
-        public RabbitMQContext Context { get; set; }
+        public MessageContext Context { get; set; }
         public QueueProducer()
         {
         }
@@ -40,16 +40,7 @@ namespace RabbitMQClient
         }
         private void Init()
         {
-            var result = ConfigFactory.Instance.GetAppSetting();
-            ConnectionFactory connectionFactory = new ConnectionFactory()
-            {
-                HostName= result.Host,
-                UserName=result.QName,
-                Password=result.QPassword,
-                RequestedHeartbeat=60,//心跳超时时间
-                AutomaticRecoveryEnabled=true//自动重连
-            };
-            _IConnection = connectionFactory.CreateConnection();
+            _IConnection =ServerManger.Instance.CreateConnectionFactory().CreateConnection();
             _IModel = _IConnection.CreateModel();
         }
         public void OnListening()
@@ -58,27 +49,49 @@ namespace RabbitMQClient
         }
         public void ListenInit()
         {
-            Context.SendConnection = _IConnection;
+            Context.ListenConnection = _IConnection;
             //记录监听日志
-            Context.SendConnection.ConnectionShutdown += (e, o) =>
+            Context.ListenConnection.ConnectionShutdown += (e, o) =>
             {
                 throw new Exception();
             };
-            Context.SendCannel = _IModel;
-            var consumer = new EventingBasicConsumer(Context.SendCannel);
+            Context.ListenCannel = _IModel;
+            var consumer = new EventingBasicConsumer(Context.ListenCannel);
             consumer.Received += consumer_received;
+            try
+            {
+                Context.ListenCannel.BasicConsume(Context.ListenQueueName, false, consumer);
+            }
+            catch (Exception)
+            {
+                throw  new Exception("接受信息出错");
+            }
+            
         }
         public void consumer_received(object o,BasicDeliverEventArgs e)
         {
             try
             {
                 var result = EventMessage.BuildMessageResult(e.Body);
-
+                if (_actionMessage.IsNotNull())
+                {
+                    _actionMessage(result);
+                }
+                if (result.IsOperationOk.IsFalse())
+                {
+                    //如果没有消费，重新放回队列
+                    Context.ListenCannel.BasicReject(e.DeliveryTag, true);
+                }
+                else if (Context.ListenCannel.IsClosed.IsFalse())
+                {
+                    //如果没有关闭，返回状态
+                    Context.ListenCannel.BasicAck(e.DeliveryTag, true);
+                }
             }
             catch (Exception)
             {
 
-                throw;
+                throw new Exception();
             }
         }
         /// <summary>
@@ -93,11 +106,13 @@ namespace RabbitMQClient
             {
                 CreateTime = DateTime.Now,
             };
-            
             return result;
         }
         public void Dispose() {
-
+            if(!Context.SendCannel.IsClosed)
+               Context.SendCannel.Close();
+            if (Context.SendConnection.IsOpen)
+                Context.SendConnection.Close();
         }
     }
 }

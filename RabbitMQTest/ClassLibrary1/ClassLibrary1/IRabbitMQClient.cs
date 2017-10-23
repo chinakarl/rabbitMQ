@@ -7,7 +7,7 @@ namespace RabbitMQClient
 {
     public interface IRabbitMQClient
     {
-        RabbitMQContext Context { get; set; }
+        MessageContext Context { get; set; }
         event ActionHandler ActionHandlerMessage;
 
         void Queueing();

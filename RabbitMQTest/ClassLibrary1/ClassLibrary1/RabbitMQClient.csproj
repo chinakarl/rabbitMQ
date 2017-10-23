@@ -58,9 +58,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueueProducer.cs" />
     <Compile Include="RabbitMQClient.cs" />
-    <Compile Include="RabbitMQClientFactory.cs" />
+    <Compile Include="ServerManger.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Entity\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

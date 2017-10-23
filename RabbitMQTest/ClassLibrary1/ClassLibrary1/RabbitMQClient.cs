@@ -14,13 +14,13 @@ namespace RabbitMQClient
     public class RabbitMQClient:IRabbitMQClient
     {
         private static readonly RabbitMQClient _instance = new RabbitMQClient();
-        public RabbitMQContext Context { get; set; }
+        public MessageContext Context { get; set; }
         private ActionHandler _actionMessage;
         private static IConnection _iConnection = null;
         
         static RabbitMQClient()
         {
-            _iConnection = CreateConnection();
+
         }
         public static  IRabbitMQClient Instance
         {
@@ -41,30 +41,25 @@ namespace RabbitMQClient
         {
             Task.Factory.StartNew(QueueListen);
         }
-        static IConnection CreateConnection()
-        {
-            //获取配置信息
-            var result = ConfigFactory.Instance.GetAppSetting();
-            //创建连接工厂
-            var confactory = new ConnectionFactory
-            {
-                HostName = result.Host,
-                UserName = result.QName,
-                Password = result.QPassword,
-                RequestedHeartbeat = 60,//心跳超时时间
-                AutomaticRecoveryEnabled = true//自动重连
-            };
-            return confactory.CreateConnection();//创建连接
-        }
         private void QueueListen()
         {
             Context.ListenConnection = _iConnection;
+            //留着输出日志，监控当前侦听状况
             Context.ListenConnection.ConnectionShutdown += (o, e) =>
             {
                 throw new Exception(e.ReplyText);
             };//连接关闭,停止，断开时
-            Context.ListenCannel = RabbitMQClientFactory.Instance.CreateModel(Context.ListenConnection);
             var customer = new EventingBasicConsumer(Context.ListenCannel);
+            customer.Received += constomer_Recevied;
+            try
+            {
+                Context.ListenCannel.BasicConsume(Context.ListenQueueName,false,customer);
+            }
+            catch (Exception)
+            {
+                throw new Exception("监听队列出错");
+                throw;
+            }
         }
         public void constomer_Recevied(object o, BasicDeliverEventArgs e)
         {
@@ -89,6 +84,20 @@ namespace RabbitMQClient
             {
                 throw new Exception("消费者错误");
             }
+        }
+        public void Send(EventMessage eventMessage,string exchangeName,string queueName)
+        {
+            Context.SendConnection = ServerManger.Instance.CreateConnectionFactory().CreateConnection();
+            const byte DeliveryTag = 2;
+            using (Context.SendConnection)
+            {
+                var messageSerializer = MessageSerializerFactory.CreateMessageSerializerInstance();
+                Context.SendCannel = Context.SendConnection.CreateModel();
+                var properties = Context.SendCannel.CreateBasicProperties();
+                properties.DeliveryMode = DeliveryTag;
+                Context.SendCannel.BasicPublish(exchangeName, queueName, true, properties, messageSerializer.SerializerByte(eventMessage));
+            }
+            
         }
         /// <summary>
         /// 释放连接
