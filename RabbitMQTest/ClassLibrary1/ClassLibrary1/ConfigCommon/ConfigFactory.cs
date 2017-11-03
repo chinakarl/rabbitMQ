@@ -17,10 +17,10 @@ namespace RabbitMQClient.ConfigCommon
         public ConfigModel GetAppSetting()
         {
             ConfigModel result = new ConfigModel();
-            result.Host = ConfigurationSettings.AppSettings["Host"];
-            result.QName = ConfigurationSettings.AppSettings["QName"];
-            result.QPassword = ConfigurationSettings.AppSettings["QPassword"];
-            result.NormalQ = ConfigurationSettings.AppSettings["NormalQ"];
+            result.Host = ConfigurationSettings.AppSettings["MqHost"];
+            result.QName = ConfigurationSettings.AppSettings["MqUserName"];
+            result.QPassword = ConfigurationSettings.AppSettings["MqPassword"];
+            result.NormalQ = ConfigurationSettings.AppSettings["MqListenQueueName"];
             return result;
         }
     }

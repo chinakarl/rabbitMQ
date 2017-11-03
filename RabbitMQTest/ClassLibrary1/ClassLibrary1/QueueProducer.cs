@@ -40,11 +40,17 @@ namespace RabbitMQClient
         }
         private void Init()
         {
+            Context = new MessageContext()
+            {
+                ListenQueueName = "zhxtest.queue"
+            };
             _IConnection =ServerManger.Instance.CreateConnectionFactory().CreateConnection();
             _IModel = _IConnection.CreateModel();
+
         }
         public void OnListening()
         {
+            Init();
             Task.Factory.StartNew(ListenInit);
         }
         public void ListenInit()

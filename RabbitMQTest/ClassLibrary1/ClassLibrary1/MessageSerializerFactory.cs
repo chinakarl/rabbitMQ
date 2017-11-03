@@ -14,6 +14,6 @@ namespace RabbitMQClient
         public static IMessageSerializer CreateMessageSerializerInstance()
         {
             return new MessageSerializer();
-         }
+        }
     }
 }

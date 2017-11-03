@@ -20,7 +20,7 @@ namespace RabbitMQClient
         
         static RabbitMQClient()
         {
-
+            
         }
         public static  IRabbitMQClient Instance
         {

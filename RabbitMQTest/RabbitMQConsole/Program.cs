@@ -30,29 +30,36 @@ namespace RabbitMQConsole
             //IConnection con=   RabbitMQClientFactory.Instance.CreateConnection();
             //RabbitMQClientFactory.Instance.CreateModel(con);
 
-
+            Listening();
             Console.ReadLine();
         }
         private static void Listening()
         {
-            //RabbitMQClient.RabbitMQClient.Instance.ActionHandlerMessage += mqClient_ActionEventMessage;
-           // RabbitMQClient.RabbitMQClient.Instance.Queueing();
+            RabbitMQClient.RabbitMQClient.Instance.ActionHandlerMessage += mqClient_ActionEventMessage;
+            RabbitMQClient.QueueProducer.Instance.OnListening();
         }
 
-        //private static void mqClient_ActionEventMessage(EventMessageResult result)
-        //{
-        //    if (result.EventMessageBytes.EventMessageMarkcode =="")
-        //    {
-        //        var message =
-        //            MessageSerializerFactory.CreateMessageSerializerInstance()
-        //                .Deserialize<UpdatePurchaseOrderStatusByBillIdMqContract>(result.MessageBytes);
+        private static void mqClient_ActionEventMessage(EventMessageResult result)
+        {
+            if (result.EventMessageBytes.EventMessageMarkcode == "")
+            {
+                var message =
+                    MessageSerializerFactory.CreateMessageSerializerInstance()
+                        .Deserializer<UpdatePurchaseOrderStatusByBillIdMqContract>(result.MessageBytes);
 
-        //        result.IsOperationOk = true; //处理成功
+                result.IsOperationOk = true; //处理成功
 
-        //        Console.WriteLine(message.ModifiedBy);
-        //    }
-        //}
-
+                Console.WriteLine(message.ModifiedBy);
+            }
+        }
+        public class UpdatePurchaseOrderStatusByBillIdMqContract
+        {
+            public int UpdatePurchaseOrderStatusType;
+            public int RelationBillType;
+            public int RelationBillId;
+            public int UpdateStatus;
+            public int ModifiedBy;
+        }
         //private static void SendEventMessage()
         //{
         //    for (var i = 1; i < 10000; i++)
